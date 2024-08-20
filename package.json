@@ -1,0 +1,25 @@
+{
+  "name": "tetris-js",
+  "version": "1.0.0",
+  "description": "multiplayer tetris websockets",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server/main.js | http-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/8ctopotamus/tetris-js.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/8ctopotamus/tetris-js/issues"
+  },
+  "homepage": "https://github.com/8ctopotamus/tetris-js#readme",
+  "dependencies": {
+    "express": "^4.19.2",
+    "http-server": "^0.10.0",
+    "ws": "^3.3.1"
+  }
+}
