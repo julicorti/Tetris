@@ -45,12 +45,18 @@ class Tetris
           this.player.dropFast();
           break;
         case 'Shift':
-          // Guardar la ficha
-          this.player.savePiece();
+          if (!this.player.isPieceSaved) {
+            // Guardar la ficha si no hay una guardada
+            this.player.savePiece();
+          } else {
+            // Usar la ficha guardada si ya hay una guardada
+            this.player.useSavedPiece();
+          }
           break;
       }
     });
   }
+  
 
   draw()
   {
