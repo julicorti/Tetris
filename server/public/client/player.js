@@ -87,10 +87,13 @@ class Player {
     if (this.arena.collide(this)) {
       this.pos.y--;
       this.arena.merge(this);
+      const linesCleared = this.arena.sweep();
+      if (linesCleared > 0) {
+        this.score += linesCleared;
+        this.tetris.lineCount += linesCleared;
+      }
       this.reset();
-      this.score += this.arena.sweep();
       this.events.emit('score', this.score);
-      return;
     }
     this.events.emit('pos', this.pos);
   }
@@ -121,40 +124,14 @@ class Player {
     this.matrix = this.createPiece(pieces[(pieces.length * Math.random()) | 0]);
     this.pos.y = 0;
     this.pos.x =
-      ((this.arena.matrix[0].length / 2) | 0) - (this.matrix[0].length / 2) | 0;
+      ((this.arena.matrix[0].length / 2) | 0) -
+      ((this.matrix[0].length / 2) | 0);
     if (this.arena.collide(this)) {
       this.arena.clear();
       this.score = 0;
       this.events.emit('score', this.score);
     }
-
     this.events.emit('pos', this.pos);
-    this.events.emit('matrix', this.matrix);
-  }
-
-  savePiece() {
-    if (!this.isPieceSaved) {
-      if (this.savedPiece) {
-        const temp = this.matrix;
-        this.matrix = this.savedPiece;
-        this.savedPiece = temp;
-        this.pos.y = 0; // Resetea la posición vertical para que la pieza guardada aparezca en la parte superior
-      } else {
-        this.savedPiece = this.matrix;
-        this.reset();
-      }
-      this.isPieceSaved = true;
-    }
-  }
-
-  useSavedPiece() {
-    if (this.isPieceSaved && this.savedPiece) {
-      const temp = this.matrix;
-      this.matrix = this.savedPiece;
-      this.savedPiece = temp;
-      this.pos.y = 0; // Resetea la posición vertical para que la pieza guardada aparezca en la parte superior
-      this.isPieceSaved = false;
-    }
   }
 
   rotate(dir) {
@@ -170,7 +147,7 @@ class Player {
         return;
       }
     }
-    this.events.emit('matrix', this.matrix);
+    this.events.emit('pos', this.pos);
   }
 
   _rotateMatrix(matrix, dir) {
@@ -179,66 +156,10 @@ class Player {
         [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
       }
     }
-
     if (dir > 0) {
       matrix.forEach((row) => row.reverse());
     } else {
       matrix.reverse();
-    }
-  }
-
-  draw() {
-    if (this.context) {
-      this.clearCanvas();
-      this.drawGrid(); // Dibuja la cuadrícula
-      this.drawMatrix(this.matrix, this.pos);
-    } else {
-      console.error('Contexto del canvas no disponible.');
-    }
-  }
-
-  clearCanvas() {
-    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-  }
-
-  drawGrid() {
-    const width = this.canvas.width;
-    const height = this.canvas.height;
-    this.context.strokeStyle = '#ddd'; // Color de las líneas de la cuadrícula
-    this.context.lineWidth = 0.5; // Ancho de las líneas de la cuadrícula
-
-    // Dibuja las líneas verticales
-    for (let x = 0; x <= width; x += this.gridSize) {
-      this.context.beginPath();
-      this.context.moveTo(x, 0);
-      this.context.lineTo(x, height);
-      this.context.stroke();
-    }
-
-    // Dibuja las líneas horizontales
-    for (let y = 0; y <= height; y += this.gridSize) {
-      this.context.beginPath();
-      this.context.moveTo(0, y);
-      this.context.lineTo(width, y);
-      this.context.stroke();
-    }
-  }
-
-  drawMatrix(matrix, offset) {
-    if (this.context) {
-      matrix.forEach((row, y) => {
-        row.forEach((value, x) => {
-          if (value) {
-            this.context.fillStyle = 'red'; // Cambia esto según el color de la pieza
-            this.context.fillRect(
-              (offset.x + x) * this.gridSize,
-              (offset.y + y) * this.gridSize,
-              this.gridSize,
-              this.gridSize
-            );
-          }
-        });
-      });
     }
   }
 
@@ -247,5 +168,17 @@ class Player {
     if (this.dropCounter > this.dropInterval) {
       this.drop();
     }
+  }
+
+  savePiece() {
+    this.savedPiece = this.matrix;
+    this.isPieceSaved = true;
+  }
+
+  useSavedPiece() {
+    const temp = this.matrix;
+    this.matrix = this.savedPiece;
+    this.savedPiece = temp;
+    this.isPieceSaved = false;
   }
 }

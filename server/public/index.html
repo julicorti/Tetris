@@ -26,13 +26,25 @@
       .player.local canvas {
         border-color: #fff;
       }
+
+      .stats {
+        margin-bottom: 10px;
+      }
+
+      .time, .lines {
+        font-size: 0.8em;
+      }
     </style>
   </head>
   <body>
     <template id="player-template">
       <div class="player">
+        <div class="stats">
+          <div class="time">Time: 00:00</div>
+          <div class="lines">Lines: 0</div>
+        </div>
         <div class="score"></div>
-        <canvas  class="player-board" width="240" height="400"></canvas>
+        <canvas class="player-board" width="240" height="400"></canvas>
       </div>
     </template>
 

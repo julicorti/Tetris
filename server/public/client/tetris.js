@@ -1,14 +1,12 @@
-class Tetris
-{
-  constructor(element)
-  {
-    this.element = element
-    this.canvas = element.querySelector('canvas')
-    this.context = this.canvas.getContext('2d')
-    this.context.scale(20, 20)
+class Tetris {
+  constructor(element) {
+    this.element = element;
+    this.canvas = element.querySelector('canvas');
+    this.context = this.canvas.getContext('2d');
+    this.context.scale(20, 20);
 
-    this.arena = new Arena(12, 20)
-    this.player = new Player(this)
+    this.arena = new Arena(12, 20);
+    this.player = new Player(this);
 
     this.colors = [
       null,
@@ -19,76 +17,75 @@ class Tetris
       '#FF830D',
       '#FFE138',
       '#3877FF'
-    ]
+    ];
 
     this._bindEvents();
 
-    let lastTime = 0
+    let lastTime = 0;
     this._update = (time = 0) => {
-      const deltaTime = time - lastTime
-      lastTime = time
+      const deltaTime = time - lastTime;
+      lastTime = time;
 
-      this.player.update(deltaTime)
+      this.player.update(deltaTime);
 
-      this.draw()
-      requestAnimationFrame(this._update)
-    }
+      this.draw();
+      requestAnimationFrame(this._update);
+    };
 
-    this.updateScore()
+    this.updateScore();
+    this.startSpeedIncrement(); // Inicia el incremento de velocidad
+  }
+
+  startSpeedIncrement() {
+    setInterval(() => {
+      if (this.player.dropInterval > 100) { // Ajusta el valor según tu preferencia mínima
+        this.player.dropInterval -= 50; // Incrementa la velocidad cada 20 segundos
+        console.log(`Nueva velocidad: ${this.player.dropInterval}`);
+      }
+    }, 10000); // 20 segundos
   }
 
   _bindEvents() {
     window.addEventListener('keydown', (e) => {
       switch (e.key) {
         case ' ':
-          // Bajar la ficha rápidamente
           this.player.dropFast();
           break;
         case 'Shift':
           if (!this.player.isPieceSaved) {
-            // Guardar la ficha si no hay una guardada
             this.player.savePiece();
           } else {
-            // Usar la ficha guardada si ya hay una guardada
             this.player.useSavedPiece();
           }
           break;
       }
     });
   }
-  
 
-  draw()
-  {
-    // clear canvas
-    this.context.fillStyle = '#000'
-    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height)
+  draw() {
+    this.context.fillStyle = '#000';
+    this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.drawMatrix(this.arena.matrix, {x: 0, y: 0})
-    this.drawMatrix(this.player.matrix, this.player.pos)
+    this.drawMatrix(this.arena.matrix, {x: 0, y: 0});
+    this.drawMatrix(this.player.matrix, this.player.pos);
   }
 
-  drawMatrix(matrix, offset)
-  {
+  drawMatrix(matrix, offset) {
     matrix.forEach((row, y) => {
       row.forEach((value, x) => {
         if (value !== 0) {
-          this.context.fillStyle = this.colors[value]
-          this.context.fillRect(x + offset.x,
-                                y + offset.y,
-                                1, 1)
+          this.context.fillStyle = this.colors[value];
+          this.context.fillRect(x + offset.x, y + offset.y, 1, 1);
         }
-      })
-    })
+      });
+    });
   }
 
-  run()
-  {
-    this._update()
+  run() {
+    this._update();
   }
 
-  serialize()
-  {
+  serialize() {
     return {
       arena: {
         matrix: this.arena.matrix
@@ -98,19 +95,17 @@ class Tetris
         pos: this.player.pos,
         score: this.player.score,
       }
-    }
+    };
   }
 
-  unserialize(state)
-  {
-    this.arena = Object.assign(state.arena)
-    this.player = Object.assign(state.player)
-    this.updateScore(this.player.score)
-    this.draw()
+  unserialize(state) {
+    this.arena = Object.assign(state.arena);
+    this.player = Object.assign(state.player);
+    this.updateScore(this.player.score);
+    this.draw();
   }
 
-  updateScore()
-  {
-    this.element.querySelector('.score').innerText = this.player.score
+  updateScore() {
+    this.element.querySelector('.score').innerText = this.player.score;
   }
 }
