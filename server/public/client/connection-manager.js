@@ -72,30 +72,38 @@ class ConnectionManager {
   watchEvents() {
     const local = this.localTetris;
     const player = local.player;
+    const arena = local.arena;
 
-    const playerEventNames = ['pos', 'matrix', 'score','linesCleared'];
-    playerEventNames.forEach(prop => {
-      player.events.listen(prop, value => {
-        this.conn.emit("DataPlayer",{
-          type: 'state-update',
-          fragment: 'player',
-          state: [prop, value]
+    // Escuchar líneas despejadas
+    arena.events.listen('linesCleared', (lines) => {
+        this.conn.emit('DataPlayer', {
+            type: 'linesCleared',
+            linesCleared: lines,
         });
-      });
+    });
+
+    const playerEventNames = ['pos', 'matrix', 'score'];
+    playerEventNames.forEach(prop => {
+        player.events.listen(prop, value => {
+            this.conn.emit("DataPlayer", {
+                type: 'state-update',
+                fragment: 'player',
+                state: [prop, value]
+            });
+        });
     });
 
     const arenaEventNames = ['matrix'];
-    const arena = local.arena;
     arenaEventNames.forEach(prop => {
-      arena.events.listen(prop, value => {
-        this.send({
-          type: 'state-update',
-          fragment: 'arena',
-          state: [prop, value]
+        arena.events.listen(prop, value => {
+            this.send({
+                type: 'state-update',
+                fragment: 'arena',
+                state: [prop, value]
+            });
         });
-      });
     });
-  }
+}
 
   updateManager(peers) {
     const me = peers.you;

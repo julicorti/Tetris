@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const http = require('http');
-const socketIo = require('socket.io'); // Asegúrate de que socket.io esté instalado
+const socketIo = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
@@ -11,22 +11,38 @@ const io = socketIo(server); // Inicializa socket.io
 app.use(express.static(path.join(__dirname, 'public')));
 
 io.on('connection', (socket) => {
-  console.log('A player connected');
+  console.log('A player connected', socket.id);
 
+  // Evento para manejar cuando un jugador se desconecta
   socket.on('disconnect', () => {
-    console.log('A player disconnected');
+    console.log('A player disconnected', socket.id);
   });
 
-  socket.on('DataPlayer', (data)=>{
+  // Evento para cuando un jugador despeja líneas
+  socket.on('DataPlayer', (data) => {
+    // Validar que el objeto 'data' y 'state' existan
+    if (data && data.state && data.state[0] === "linesCleared") {
+      const linesCleared = data.state[1];
+      
+      console.log(`Player ${socket.id} cleared ${linesCleared} lines`);
 
-    if (data['state'][0] == "linesCleared"){
-      socket.broadcast.emit("LineIn", data['state'][1])
+      // Emitir las líneas despejadas a todos los jugadores excepto al actual
+      socket.broadcast.emit('LineIn', linesCleared);
     }
-  })
-  // Agrega eventos aquí para manejar la comunicación entre jugadores
-  // socket.on('event-name', (data) => { ... });
-});
+  });
 
+  // Sincronizar estado del tablero (arena) entre jugadores
+  socket.on('syncBoard', (boardState) => {
+    // Enviar estado del tablero a otros jugadores
+    socket.broadcast.emit('updateBoard', boardState);
+  });
+
+  // Iniciar juego entre jugadores
+  socket.on('startGame', () => {
+    // Lógica para iniciar el juego y notificar a todos los jugadores
+    io.emit('gameStarted'); // Enviar evento a todos los jugadores conectados
+  });
+});
 
 // Iniciar el servidor en el puerto 8080
 server.listen(8080, () => {
