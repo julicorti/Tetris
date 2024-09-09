@@ -37,7 +37,7 @@
     </style>
   </head>
   <body>
-    <template id="player-template">
+  <!--   <template id="player-template">
       <div class="player">
         <div class="stats">
           <div class="time">Time: 00:00</div>
@@ -46,9 +46,16 @@
         <div class="score"></div>
         <canvas class="player-board" width="240" height="400"></canvas>
       </div>
+    </template> -->
+    <template id="player-template">
+      <div class="player">
+        <div class="score">Score: 0</div>
+        <canvas  class="tetris" width="240" height="400"></canvas>
+      </div>
     </template>
-
     <script src="client/tetris-manager.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+
     <script src="client/connection-manager.js"></script>
     <script src="client/arena.js"></script>
     <script src="client/events.js"></script>

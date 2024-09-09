@@ -17,9 +17,16 @@ io.on('connection', (socket) => {
     console.log('A player disconnected');
   });
 
+  socket.on('DataPlayer', (data)=>{
+
+    if (data['state'][0] == "linesCleared"){
+      socket.broadcast.emit("LineIn", data['state'][1])
+    }
+  })
   // Agrega eventos aquí para manejar la comunicación entre jugadores
   // socket.on('event-name', (data) => { ... });
 });
+
 
 // Iniciar el servidor en el puerto 8080
 server.listen(8080, () => {

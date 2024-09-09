@@ -50,6 +50,7 @@ class Arena {
               rowCount *= 2;
           }
       }
+      
       this.events.emit('matrix', this.matrix);
       return linesCleared;
   }

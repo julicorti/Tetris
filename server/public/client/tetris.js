@@ -65,12 +65,15 @@ class Tetris {
   draw() {
     this.context.fillStyle = '#000';
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-
+    // console.log(this.canvas)
+    
     this.drawMatrix(this.arena.matrix, {x: 0, y: 0});
     this.drawMatrix(this.player.matrix, this.player.pos);
+    this.context.fillStyle = '#fff';
   }
 
   drawMatrix(matrix, offset) {
+    this.updateScore()
     matrix.forEach((row, y) => {
       row.forEach((value, x) => {
         if (value !== 0) {

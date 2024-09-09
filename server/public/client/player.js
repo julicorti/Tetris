@@ -15,7 +15,8 @@ class Player {
     this.matrix = null;
     this.savedPiece = null;
     this.isPieceSaved = false;
-    this.score = 0;
+    this.score = 10;
+    this.linesCleared = 0;  // Nuevo contador de líneas completadas
 
     this.gridSize = 30; // Tamaño de cada celda en la cuadrícula
 
@@ -24,8 +25,14 @@ class Player {
   }
 
   initCanvas() {
-    // Encuentra el canvas y su contexto
-    this.canvas = this.tetris.element.querySelector('.tetris');
+    // Verifica si ya hay un canvas en el DOM, si no, clona y agrega el template
+    if (!this.tetris.element.querySelector('.tetris')) {
+      const template = document.getElementById('player-template').content.cloneNode(true);
+      this.tetris.element.appendChild(template);  // Agrega el template al DOM
+    }
+
+    // Ahora intenta obtener el canvas
+    this.canvas = this.tetris.element.querySelector('.player-board');
     if (this.canvas) {
       this.context = this.canvas.getContext('2d');
       this.canvas.width = this.arena.matrix[0].length * this.gridSize;
@@ -36,6 +43,7 @@ class Player {
   }
 
   createPiece(type) {
+    // Creación de piezas
     if (type === 'T') {
       return [
         [0, 0, 0],
@@ -84,29 +92,37 @@ class Player {
   drop() {
     this.pos.y++;
     this.dropCounter = 0;
+
     if (this.arena.collide(this)) {
       this.pos.y--;
       this.arena.merge(this);
-      const linesCleared = this.arena.sweep();
-      if (linesCleared > 0) {
-        this.score += linesCleared;
-        this.tetris.lineCount += linesCleared;
-      }
-      this.reset();
+      const lines = this.arena.sweep();  // Guardar el número de líneas eliminadas
+      this.score += lines * 10;  // Aumentar el puntaje según las líneas
+      this.linesCleared += lines;  // Actualizar el contador de líneas
+
       this.events.emit('score', this.score);
+      this.events.emit('linesCleared', this.linesCleared);  // Emitir el evento de líneas eliminadas
+      console.log("LAINS CLIRED")
+      this.reset();
+      return;
     }
     this.events.emit('pos', this.pos);
   }
-
   dropFast() {
     while (!this.arena.collide(this)) {
       this.pos.y++;
     }
     this.pos.y--;
     this.arena.merge(this);
-    this.reset();
-    this.score += this.arena.sweep();
+    
+    
+    const lines = this.arena.sweep();
+    this.score += lines * 10;
+    this.linesCleared += lines;  // Actualizar el contador de líneas
+
     this.events.emit('score', this.score);
+    this.events.emit('linesCleared', this.linesCleared);  // Emitir el evento de líneas eliminadas
+    this.reset();
     this.events.emit('pos', this.pos);
   }
 
@@ -121,17 +137,58 @@ class Player {
 
   reset() {
     const pieces = 'ILJOTSZ';
+    this.linesCleared = 0
     this.matrix = this.createPiece(pieces[(pieces.length * Math.random()) | 0]);
     this.pos.y = 0;
     this.pos.x =
-      ((this.arena.matrix[0].length / 2) | 0) -
-      ((this.matrix[0].length / 2) | 0);
+      ((this.arena.matrix[0].length / 2) | 0) - (this.matrix[0].length / 2) | 0;
     if (this.arena.collide(this)) {
       this.arena.clear();
       this.score = 0;
+      this.linesCleared = 0;  // Reiniciar el contador de líneas
       this.events.emit('score', this.score);
+      this.events.emit('linesCleared', this.linesCleared);
     }
+
     this.events.emit('pos', this.pos);
+    this.events.emit('matrix', this.matrix);
+  }
+  addGarbageLines(lines) {
+    const width = this.arena.matrix[0].length; // Ancho del tablero
+    for (let i = 0; i < lines; i++) {
+        const garbageLine = new Array(width).fill(0);
+        // Agregar un hueco aleatorio
+        const hole = Math.floor(Math.random() * width);
+        garbageLine[hole] = 0;
+        // Añadir la línea de basura al final del tablero
+        this.arena.matrix.pop();  // Eliminar la fila superior
+        this.arena.matrix.unshift(garbageLine);  // Añadir la línea de basura abajo
+    }
+}
+
+  savePiece() {
+    if (!this.isPieceSaved) {
+      if (this.savedPiece) {
+        const temp = this.matrix;
+        this.matrix = this.savedPiece;
+        this.savedPiece = temp;
+        this.pos.y = 0; // Resetea la posición vertical para que la pieza guardada aparezca en la parte superior
+      } else {
+        this.savedPiece = this.matrix;
+        this.reset();
+      }
+      this.isPieceSaved = true;
+    }
+  }
+
+  useSavedPiece() {
+    if (this.isPieceSaved && this.savedPiece) {
+      const temp = this.matrix;
+      this.matrix = this.savedPiece;
+      this.savedPiece = temp;
+      this.pos.y = 0; // Resetea la posición vertical para que la pieza guardada aparezca en la parte superior
+      this.isPieceSaved = false;
+    }
   }
 
   rotate(dir) {
@@ -147,7 +204,7 @@ class Player {
         return;
       }
     }
-    this.events.emit('pos', this.pos);
+    this.events.emit('matrix', this.matrix);
   }
 
   _rotateMatrix(matrix, dir) {
@@ -156,10 +213,65 @@ class Player {
         [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]];
       }
     }
+
     if (dir > 0) {
       matrix.forEach((row) => row.reverse());
     } else {
       matrix.reverse();
+    }
+  }
+
+  draw() {
+    if (this.context) {
+      this.clearCanvas();
+      this.drawGrid(); // Dibuja la cuadrícula
+      this.drawMatrix(this.matrix, this.pos);
+    } else {
+      console.error('Contexto del canvas no disponible.');
+    }
+  }
+  clearCanvas() {
+    this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+  }
+
+  drawGrid() {
+    const width = this.canvas.width;
+    const height = this.canvas.height;
+    this.context.strokeStyle = '#ddd'; // Color de las líneas de la cuadrícula
+    this.context.lineWidth = 0.5; // Ancho de las líneas de la cuadrícula
+
+    // Dibuja las líneas verticales
+    for (let x = 0; x <= width; x += this.gridSize) {
+      this.context.beginPath();
+      this.context.moveTo(x, 0);
+      this.context.lineTo(x, height);
+      this.context.stroke();
+    }
+
+    // Dibuja las líneas horizontales
+    for (let y = 0; y <= height; y += this.gridSize) {
+      this.context.beginPath();
+      this.context.moveTo(0, y);
+      this.context.lineTo(width, y);
+      this.context.stroke();
+    }
+  }
+
+  drawMatrix(matrix, offset) {
+    if (this.context) {
+      matrix.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value) {
+            this.context.fillStyle = 'red'; // Cambia esto según el color de la pieza
+            this.context.fillRect(
+              (offset.x + x) * this.gridSize,
+              (offset.y + y) * this.gridSize,
+              this.gridSize,
+              this.gridSize
+            );
+          }
+        });
+      });
     }
   }
 
@@ -168,17 +280,5 @@ class Player {
     if (this.dropCounter > this.dropInterval) {
       this.drop();
     }
-  }
-
-  savePiece() {
-    this.savedPiece = this.matrix;
-    this.isPieceSaved = true;
-  }
-
-  useSavedPiece() {
-    const temp = this.matrix;
-    this.matrix = this.savedPiece;
-    this.savedPiece = temp;
-    this.isPieceSaved = false;
   }
 }
