@@ -63,31 +63,62 @@ class Tetris {
   }
 
   draw() {
+    // Fondo del tablero
     this.context.fillStyle = '#000';
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
-    // console.log(this.canvas)
-    
+
+    // Dibuja la cuadrícula ligera de fondo
+    this.drawBackgroundGrid();  
+
+    // Dibuja la arena (piezas ya colocadas) y las piezas activas
     this.drawMatrix(this.arena.matrix, {x: 0, y: 0});
     this.drawMatrix(this.player.matrix, this.player.pos);
-    this.context.fillStyle = '#fff';
   }
 
+  drawBackgroundGrid() {
+    const { width, height } = this.canvas;
+    const cellSize = 1; // Tamaño de las celdas ajustado al escalado
+
+    // Estilo de la cuadrícula del fondo
+    this.context.strokeStyle = 'rgba(255, 255, 255, 0.1)'; // Cuadrícula muy tenue
+    this.context.lineWidth = 0.07; // Línea muy delgada para el fondo
+
+    // Dibujar líneas verticales
+    for (let x = 0; x < width; x += cellSize) {
+      this.context.beginPath();
+      this.context.moveTo(x, 0);
+      this.context.lineTo(x, height);
+      this.context.stroke();
+    }
+
+    // Dibujar líneas horizontales
+    for (let y = 0; y < height; y += cellSize) {
+      this.context.beginPath();
+      this.context.moveTo(0, y);
+      this.context.lineTo(width, y);
+      this.context.stroke();
+    }
+  }
   drawMatrix(matrix, offset) {
-    this.updateScore()
+    this.updateScore();
     matrix.forEach((row, y) => {
       row.forEach((value, x) => {
         if (value !== 0) {
           this.context.fillStyle = this.colors[value];
           this.context.fillRect(x + offset.x, y + offset.y, 1, 1);
+          
+          // Dibuja los bordes de la cuadrícula alrededor de cada celda
+          this.context.strokeStyle = 'rgba(255, 255, 255, 0.2)'; // Líneas semitransparentes
+          this.context.lineWidth = 0.10; // Grosor del borde
+          this.context.strokeRect(x + offset.x, y + offset.y, 1, 1); // Dibuja el borde de cada celda
         }
       });
     });
   }
-
   run() {
     this._update();
   }
-
+  
   serialize() {
     return {
       arena: {

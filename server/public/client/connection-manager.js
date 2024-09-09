@@ -24,25 +24,33 @@ class ConnectionManager {
       console.log("JODER, ME ESTAN ATACANDO!", e)
  this.addLineToPlayer()
     })
+    this.conn.on("addLines", (lines) => {
+      console.log("Recibí líneas de penalización", lines);
+      this.addLineToPlayer(lines);
+    });
   }
-  addLineToPlayer() {
+  addLineToPlayer(lines = 1) {
     const player = this.localTetris.player;
     const arena = player.arena;
   
-    // Añade una nueva línea al final de la arena
-    const newLine = Array(arena.matrix[0].length).fill(1);  // Llena la nueva fila con bloques (puedes personalizar el valor)
+    for (let i = 0; i < lines; i++) {
+      // Añadir la nueva línea de penalización al final de la arena
+      const newLine = Array(arena.matrix[0].length).fill(1);  // Llena la nueva fila con bloques
+      const hole = Math.floor(Math.random() * arena.matrix[0].length);  // Agregar un hueco en la fila
+      newLine[hole] = 0;  // Crear el hueco
   
-    // Elimina la fila superior y desplaza todas las filas hacia arriba
-    arena.matrix.pop();  // Elimina la fila superior
-    arena.matrix.unshift(newLine);  // Añade la nueva fila en la parte inferior
+      arena.matrix.pop();  // Elimina la fila superior
+      arena.matrix.unshift(newLine);  // Añade la nueva fila en la parte inferior
+    }
   
-    // Emitir el cambio para que el jugador se actualice visualmente
-    player.pos.y = Math.max(player.pos.y - 1, 0); // Asegúrate de que la posición Y se ajuste para evitar que la pieza salga del tablero
+    // Ajustar la posición Y del jugador
+    player.pos.y = Math.max(player.pos.y - lines, 0);
     player.events.emit('pos', player.pos);
     player.events.emit('matrix', player.matrix);
   
     player.draw();  // Redibuja el jugador con la nueva línea
   }
+  
   
   initSession() {
     const sessionId = window.location.hash.split('#')[1];
