@@ -39,10 +39,10 @@ class Tetris {
   startSpeedIncrement() {
     setInterval(() => {
       if (this.player.dropInterval > 100) { // Ajusta el valor según tu preferencia mínima
-        this.player.dropInterval -= 50; // Incrementa la velocidad cada 20 segundos
+        this.player.dropInterval -= 50; // Incrementa la velocidad cada 10 segundos
         console.log(`Nueva velocidad: ${this.player.dropInterval}`);
       }
-    }, 10000); // 20 segundos
+    }, 10000); // 10 segundos
   }
 
   _bindEvents() {
@@ -99,6 +99,7 @@ class Tetris {
       this.context.stroke();
     }
   }
+
   drawMatrix(matrix, offset) {
     this.updateScore();
     matrix.forEach((row, y) => {
@@ -115,6 +116,7 @@ class Tetris {
       });
     });
   }
+
   run() {
     this._update();
   }

@@ -20,10 +20,8 @@ io.on('connection', (socket) => {
 
   // Evento para cuando un jugador despeja líneas
   socket.on('DataPlayer', (data) => {
-    // Validar que el objeto 'data' y 'state' existan
     if (data && data.state && data.state[0] === "linesCleared") {
       const linesCleared = data.state[1];
-      
       console.log(`Player ${socket.id} cleared ${linesCleared} lines`);
 
       // Emitir las líneas despejadas a todos los jugadores excepto al actual
@@ -33,13 +31,11 @@ io.on('connection', (socket) => {
 
   // Sincronizar estado del tablero (arena) entre jugadores
   socket.on('syncBoard', (boardState) => {
-    // Enviar estado del tablero a otros jugadores
     socket.broadcast.emit('updateBoard', boardState);
   });
 
   // Iniciar juego entre jugadores
   socket.on('startGame', () => {
-    // Lógica para iniciar el juego y notificar a todos los jugadores
     io.emit('gameStarted'); // Enviar evento a todos los jugadores conectados
   });
 });
