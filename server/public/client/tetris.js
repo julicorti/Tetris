@@ -35,7 +35,36 @@ class Tetris {
     this.updateScore();
     this.startSpeedIncrement(); // Inicia el incremento de velocidad
   }
+  gameOver() {
+    // Mostrar la pantalla de "Game Over"
+    const gameOverDiv = document.createElement('div');
+    gameOverDiv.classList.add('game-over-screen');
+    gameOverDiv.innerHTML = `
+      <div class="game-over-message">Game Over</div>
+      <button class="reset-button">Restart</button>
+    `;
+    
+    this.element.appendChild(gameOverDiv);
 
+    // Botón de reinicio
+    const resetButton = gameOverDiv.querySelector('.reset-button');
+    resetButton.addEventListener('click', () => {
+      this.resetGame();
+    });
+  }
+  resetGame() {
+    // Eliminar la pantalla de "Game Over"
+    const gameOverScreen = this.element.querySelector('.game-over-screen');
+    if (gameOverScreen) {
+      gameOverScreen.remove();
+    }
+
+    // Reiniciar el juego
+    this.arena.clear();
+    this.player.reset();
+    this.updateScore();
+    this.startSpeedIncrement(); // Reiniciar el incremento de velocidad
+  }
   startSpeedIncrement() {
     setInterval(() => {
       if (this.player.dropInterval > 100) { // Ajusta el valor según tu preferencia mínima

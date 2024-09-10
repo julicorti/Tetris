@@ -103,6 +103,11 @@ class Player {
       this.events.emit('score', this.score);
       this.events.emit('linesCleared', this.linesCleared);  // Emitir el evento de líneas eliminadas
       console.log("LAINS CLIRED")
+      // Verificar si hay Game Over
+      if (this.pos.y === 0) {
+        this.tetris.gameOver();  // Llamar a gameOver cuando el jugador pierde
+        return;
+      }
       this.reset();
       return;
     }
