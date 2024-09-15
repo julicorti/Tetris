@@ -22,14 +22,15 @@ class ConnectionManager {
 
     this.conn.on("LineIn", (e)=>{
       console.log("JODER, ME ESTAN ATACANDO!", e)
- this.addLineToPlayer()
+
+ this.addLineToPlayer(e)
     })
     this.conn.on("addLines", (lines) => {
       console.log("Recibí líneas de penalización", lines);
       this.addLineToPlayer(lines);
     });
   }
-  addLineToPlayer(lines = 1) {
+  addLineToPlayer(lines ) {
     const player = this.localTetris.player;
     const arena = player.arena;
   

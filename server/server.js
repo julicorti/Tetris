@@ -26,12 +26,16 @@ io.on('connection', (socket) => {
   socket.on('DataPlayer', (data) => {
     if (data.type == "linesCleared") {
       const linesCleared = data.linesCleared;
-      if(linesCleared > 0 ){
-        
+      if (linesCleared > 0) {
         console.log(`Player ${socket.id} cleared ${linesCleared} lines`);
         socket.broadcast.emit('LineIn', linesCleared);
       }
-      // Emitir las líneas despejadas a todos los jugadores excepto al actual
+
+      // Detectar "full clean" y enviar 6 líneas al oponente
+      if (data.fullClean) {
+        console.log(`Player ${socket.id} achieved a Full Clean! Sending 6 lines to the opponent.`);
+        socket.broadcast.emit('receiveLines', 6);
+      }
     }
   });
 
