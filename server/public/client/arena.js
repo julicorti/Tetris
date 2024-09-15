@@ -6,8 +6,12 @@ class Arena {
       }
       this.matrix = matrix;
       this.events = new Events();
-  }
+      this.garbageColor = 'rgba(255, 0, 0, 0.5)'; // Color por defecto para las líneas de basura
 
+  }
+  setGarbageColor(color) {
+    this.garbageColor = color;
+  }
   clear() {
       this.matrix.forEach(row => row.fill(0));
       this.events.emit('matrix', this.matrix);
@@ -55,7 +59,7 @@ class Arena {
               rowCount *= 2;
           }
       }
-      
+      this.events.emit('linesCleared', linesCleared)
       this.events.emit('matrix', this.matrix);
       return linesCleared;
   }

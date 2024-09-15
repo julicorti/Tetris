@@ -35,12 +35,15 @@ class ConnectionManager {
   
     for (let i = 0; i < lines; i++) {
       // Añadir la nueva línea de penalización al final de la arena
-      const newLine = Array(arena.matrix[0].length).fill(1);  // Llena la nueva fila con bloques
+      const newLine = Array(arena.matrix[0].length).fill(8);  // Llena la nueva fila con bloques
       const hole = Math.floor(Math.random() * arena.matrix[0].length);  // Agregar un hueco en la fila
       newLine[hole] = 0;  // Crear el hueco
-  
-      arena.matrix.pop();  // Elimina la fila superior
-      arena.matrix.unshift(newLine);  // Añade la nueva fila en la parte inferior
+      console.log(arena.matrix)
+      arena.matrix.splice(0,1);  // Elimina la fila superior
+      arena.matrix.push(newLine);  // Elimina la fila superior
+
+      console.log(arena.matrix)
+
     }
   
     // Ajustar la posición Y del jugador
@@ -76,6 +79,7 @@ class ConnectionManager {
 
     // Escuchar líneas despejadas
     arena.events.listen('linesCleared', (lines) => {
+      console.log(lines)
         this.conn.emit('DataPlayer', {
             type: 'linesCleared',
             linesCleared: lines,

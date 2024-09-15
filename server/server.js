@@ -2,14 +2,18 @@ const express = require('express');
 const path = require('path');
 const http = require('http');
 const socketIo = require('socket.io');
-
+const cors = require("cors")
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server); // Inicializa socket.io
 
 // Servir archivos estáticos desde la carpeta 'public'
 app.use(express.static(path.join(__dirname, 'public')));
-
+var corsOptions = {
+  origin: '*',
+  optionsSuccessStatus: 200,
+}
+app.use(cors(corsOptions));
 io.on('connection', (socket) => {
   console.log('A player connected', socket.id);
 
@@ -20,12 +24,14 @@ io.on('connection', (socket) => {
 
   // Evento para cuando un jugador despeja líneas
   socket.on('DataPlayer', (data) => {
-    if (data && data.state && data.state[0] === "linesCleared") {
-      const linesCleared = data.state[1];
-      console.log(`Player ${socket.id} cleared ${linesCleared} lines`);
-
+    if (data.type == "linesCleared") {
+      const linesCleared = data.linesCleared;
+      if(linesCleared > 0 ){
+        
+        console.log(`Player ${socket.id} cleared ${linesCleared} lines`);
+        socket.broadcast.emit('LineIn', linesCleared);
+      }
       // Emitir las líneas despejadas a todos los jugadores excepto al actual
-      socket.broadcast.emit('LineIn', linesCleared);
     }
   });
 

@@ -102,7 +102,6 @@ class Player {
 
       this.events.emit('score', this.score);
       this.events.emit('linesCleared', this.linesCleared);  // Emitir el evento de líneas eliminadas
-      console.log("LAINS CLIRED")
       // Verificar si hay Game Over
       if (this.pos.y === 0) {
         this.tetris.gameOver();  // Llamar a gameOver cuando el jugador pierde
@@ -127,6 +126,7 @@ class Player {
 
     this.events.emit('score', this.score);
     this.events.emit('linesCleared', this.linesCleared);  // Emitir el evento de líneas eliminadas
+
     this.reset();
     this.events.emit('pos', this.pos);
   }
@@ -142,33 +142,36 @@ class Player {
 
   reset() {
     const pieces = 'ILJOTSZ';
-    this.linesCleared = 0
     this.matrix = this.createPiece(pieces[(pieces.length * Math.random()) | 0]);
     this.pos.y = 0;
     this.pos.x =
-      ((this.arena.matrix[0].length / 2) | 0) - (this.matrix[0].length / 2) | 0;
-    if (this.arena.collide(this)) {
-      this.arena.clear();
-      this.score = 0;
-      this.linesCleared = 0;  // Reiniciar el contador de líneas
-      this.events.emit('score', this.score);
-      this.events.emit('linesCleared', this.linesCleared);
-    }
+        ((this.arena.matrix[0].length / 2) | 0) - (this.matrix[0].length / 2) | 0;
 
-    this.events.emit('pos', this.pos);
-    this.events.emit('matrix', this.matrix);
+    // Añadir una pequeña pausa antes de verificar la colisión
+    setTimeout(() => {
+        // Verificación inmediata de colisión (posible "game over")
+        if (this.arena.collide(this)) {
+            this.tetris.gameOver();  // Llamar a gameOver cuando el jugador pierde
+            return;
+        }
+
+        this.events.emit('pos', this.pos);
+        this.events.emit('matrix', this.matrix);
+    }, 100); // Pausa de 100 ms
+}
+  
+ addGarbageLines(lines) {
+  const width = this.matrix[0].length; // Ancho del tablero
+  for (let i = 0; i < lines; i++) {
+    const garbageLine = new Array(width).fill(0);
+    // Agregar un hueco aleatorio
+    const hole = Math.floor(Math.random() * width);
+    garbageLine[hole] = 0;
+    // Añadir la línea de basura al final del tablero
+    this.matrix.pop();  // Eliminar la fila superior
+    this.matrix.unshift(garbageLine);  // Añadir la línea de basura abajo
   }
-  addGarbageLines(lines) {
-    const width = this.arena.matrix[0].length; // Ancho del tablero
-    for (let i = 0; i < lines; i++) {
-        const garbageLine = new Array(width).fill(0);
-        // Agregar un hueco aleatorio
-        const hole = Math.floor(Math.random() * width);
-        garbageLine[hole] = 0;
-        // Añadir la línea de basura al final del tablero
-        this.arena.matrix.pop();  // Eliminar la fila superior
-        this.arena.matrix.unshift(garbageLine);  // Añadir la línea de basura abajo
-    }
+  this.events.emit('matrix', this.matrix); // Emitir el evento de actualización
 }
 
   savePiece() {
@@ -192,6 +195,7 @@ class Player {
       this.matrix = this.savedPiece;
       this.savedPiece = temp;
       this.pos.y = 0; // Resetea la posición vertical para que la pieza guardada aparezca en la parte superior
+      this.pos.x = 5;
       this.isPieceSaved = false;
     }
   }

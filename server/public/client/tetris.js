@@ -16,13 +16,18 @@ class Tetris {
       '#F538FF',
       '#FF830D',
       '#FFE138',
-      '#3877FF'
+      '#3877FF',
+      '#777777'
     ];
+
+    this.isRunning = true; // Bandera para controlar si el juego está corriendo
+    this.speedInterval = null; // Referencia para el intervalo de velocidad
 
     this._bindEvents();
 
     let lastTime = 0;
     this._update = (time = 0) => {
+      if (!this.isRunning) return; // Detener el ciclo de actualización si el juego no está corriendo
       const deltaTime = time - lastTime;
       lastTime = time;
 
@@ -35,7 +40,10 @@ class Tetris {
     this.updateScore();
     this.startSpeedIncrement(); // Inicia el incremento de velocidad
   }
+
   gameOver() {
+    this.isRunning = false; // Detener el juego cuando ocurre el "Game Over"
+
     // Mostrar la pantalla de "Game Over"
     const gameOverDiv = document.createElement('div');
     gameOverDiv.classList.add('game-over-screen');
@@ -52,8 +60,9 @@ class Tetris {
       this.resetGame();
     });
   }
+
   resetGame() {
-    // Eliminar la pantalla de "Game Over"
+    this.isRunning = true; // Reiniciar el estado del juego
     const gameOverScreen = this.element.querySelector('.game-over-screen');
     if (gameOverScreen) {
       gameOverScreen.remove();
@@ -63,10 +72,23 @@ class Tetris {
     this.arena.clear();
     this.player.reset();
     this.updateScore();
+
+    // Limpiar el intervalo previo para evitar acumulación
+    if (this.speedInterval) {
+      clearInterval(this.speedInterval);
+    }
     this.startSpeedIncrement(); // Reiniciar el incremento de velocidad
+
+    requestAnimationFrame(this._update); // Reiniciar el ciclo de actualización
   }
+
   startSpeedIncrement() {
-    setInterval(() => {
+    // Asegurarse de que solo haya un intervalo activo
+    if (this.speedInterval) {
+      clearInterval(this.speedInterval);
+    }
+
+    this.speedInterval = setInterval(() => {
       if (this.player.dropInterval > 100) { // Ajusta el valor según tu preferencia mínima
         this.player.dropInterval -= 50; // Incrementa la velocidad cada 10 segundos
         console.log(`Nueva velocidad: ${this.player.dropInterval}`);
@@ -76,6 +98,7 @@ class Tetris {
 
   _bindEvents() {
     window.addEventListener('keydown', (e) => {
+      if (!this.isRunning) return; // Ignorar eventos si el juego no está corriendo
       switch (e.key) {
         case ' ':
           this.player.dropFast();
@@ -92,27 +115,21 @@ class Tetris {
   }
 
   draw() {
-    // Fondo del tablero
     this.context.fillStyle = '#000';
     this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // Dibuja la cuadrícula ligera de fondo
-    this.drawBackgroundGrid();  
-
-    // Dibuja la arena (piezas ya colocadas) y las piezas activas
-    this.drawMatrix(this.arena.matrix, {x: 0, y: 0});
+    this.drawBackgroundGrid();
+    this.drawMatrix(this.arena.matrix, { x: 0, y: 0 });
     this.drawMatrix(this.player.matrix, this.player.pos);
   }
 
   drawBackgroundGrid() {
     const { width, height } = this.canvas;
-    const cellSize = 1; // Tamaño de las celdas ajustado al escalado
+    const cellSize = 1;
 
-    // Estilo de la cuadrícula del fondo
-    this.context.strokeStyle = 'rgba(255, 255, 255, 0.1)'; // Cuadrícula muy tenue
-    this.context.lineWidth = 0.07; // Línea muy delgada para el fondo
+    this.context.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    this.context.lineWidth = 0.07;
 
-    // Dibujar líneas verticales
     for (let x = 0; x < width; x += cellSize) {
       this.context.beginPath();
       this.context.moveTo(x, 0);
@@ -120,7 +137,6 @@ class Tetris {
       this.context.stroke();
     }
 
-    // Dibujar líneas horizontales
     for (let y = 0; y < height; y += cellSize) {
       this.context.beginPath();
       this.context.moveTo(0, y);
@@ -136,20 +152,20 @@ class Tetris {
         if (value !== 0) {
           this.context.fillStyle = this.colors[value];
           this.context.fillRect(x + offset.x, y + offset.y, 1, 1);
-          
-          // Dibuja los bordes de la cuadrícula alrededor de cada celda
-          this.context.strokeStyle = 'rgba(255, 255, 255, 0.2)'; // Líneas semitransparentes
-          this.context.lineWidth = 0.10; // Grosor del borde
-          this.context.strokeRect(x + offset.x, y + offset.y, 1, 1); // Dibuja el borde de cada celda
+
+          this.context.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+          this.context.lineWidth = 0.10;
+          this.context.strokeRect(x + offset.x, y + offset.y, 1, 1);
         }
       });
     });
   }
 
   run() {
-    this._update();
+    this.isRunning = true;
+    requestAnimationFrame(this._update);
   }
-  
+
   serialize() {
     return {
       arena: {
