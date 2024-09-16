@@ -2,7 +2,8 @@ const tetrisManager = new TetrisManager(document)
 const localTetris = tetrisManager.createPlayer()
 localTetris.element.classList.add('local')
 localTetris.run()
-
+let startTime;
+let timerInterval;
 const connectionManager = new ConnectionManager(tetrisManager)
 connectionManager.connect('ws://localhost:8080')
 
@@ -37,6 +38,36 @@ const keyListener = (event) => {
     }
   })
 }
+// Inicializa el cronómetro
+function startTimer() {
+  startTime = new Date();
+  timerInterval = setInterval(updateTimer, 1000); // Actualiza cada segundo
+}
 
+// Actualiza el cronómetro en el DOM
+function updateTimer() {
+  const currentTime = new Date();
+  const elapsedTime = Math.floor((currentTime - startTime) / 1000); // Tiempo en segundos
+
+  const minutes = Math.floor(elapsedTime / 60);
+  const seconds = elapsedTime % 60;
+
+  // Formatea el tiempo
+  const formattedTime = `${pad(minutes)}:${pad(seconds)}`;
+  document.getElementById('time').textContent = formattedTime;
+}
+
+// Añade ceros a la izquierda para un formato de dos dígitos
+function pad(number) {
+  return number.toString().padStart(2, '0');
+}
+
+// Detiene el cronómetro
+function stopTimer() {
+  clearInterval(timerInterval);
+}
+
+// Inicia el cronómetro cuando se carga la página
+window.addEventListener('load', startTimer);
 document.addEventListener('keydown', keyListener)
 document.addEventListener('keyup', keyListener)

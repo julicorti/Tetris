@@ -1,3 +1,4 @@
+
 .game-over-screen {
   position: absolute;
   top: 0;
@@ -37,7 +38,20 @@
       transform: translateY(-10px);
   }
 }
-
+.player {
+  display: flex;
+  flex-direction: column; /* Alinea el marcador arriba y el canvas abajo */
+  align-items: center; /* Centra horizontalmente el contenido dentro del player */
+  position: relative; /* Permite el posicionamiento absoluto del marcador */
+}
+.player #time-label {
+  font-weight: bold;
+  margin-right: 5px; /* Espacio a la derecha de las etiquetas */
+}
+#time {
+  font-weight: normal;
+  margin: 0 10px; /* Espacio entre los números y las etiquetas */
+}
 .reset-button {
   padding: 10px 20px;
   font-size: 1em;
@@ -51,4 +65,42 @@
 
 .reset-button:hover {
   background-color: #FF5A00; /* Efecto de hover para el botón */
+}
+canvas.tetris {
+  border: solid .2em #707070;
+  height: 600px; /* Ajusta la altura al 100% del contenedor */
+}
+.all-clear-message {
+  position: fixed;
+  top: 50%; /* Centra verticalmente en el viewport */
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1); /* Centra el mensaje y añade escala inicial */
+  color: rgb(255, 243, 110);
+  text-shadow: 0 0 5px black, 0 0 10px white, 0 0 15px rgb(255, 243, 110);
+  font-size: 3em; /* Tamaño de fuente grande */
+  
+  padding: 20px;
+  border-radius: 15px; /* Bordes redondeados más pronunciados */
+  z-index: 1000; /* Asegura que esté por encima de otros elementos */
+  text-shadow: 2px 2px 10px rgba(255, 255, 255, 0.7); /* Sombra del texto */
+  opacity: 0;
+  animation: explode 1s ease-out forwards;
+}
+
+@keyframes explode {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.2); /* Aumento inicial del tamaño */
+  }
+  60% {
+    transform: translate(-50%, -50%) scale(1.1); /* Reducción parcial del tamaño */
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(0.8); /* Reducción final del tamaño */
+    opacity: 0;
+  }
 }
