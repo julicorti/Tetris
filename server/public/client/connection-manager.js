@@ -36,7 +36,7 @@ class ConnectionManager {
   
     for (let i = 0; i < lines; i++) {
       // Añadir la nueva línea de penalización al final de la arena
-      const newLine = Array(arena.matrix[0].length).fill(8);  // Llena la nueva fila con bloques
+      const newLine = Array(arena.matrix[0].length).fill(11);  // Llena la nueva fila con bloques
       const hole = Math.floor(Math.random() * arena.matrix[0].length);  // Agregar un hueco en la fila
       newLine[hole] = 0;  // Crear el hueco
       console.log(arena.matrix)

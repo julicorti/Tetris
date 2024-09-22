@@ -17,7 +17,12 @@ class Tetris {
       '#FF830D',
       '#FFE138',
       '#3877FF',
-      '#777777'
+      '#0a3a6d',
+      '#00660e',
+      '#630066',
+      '#777777',
+      '#f7916d',
+
     ];
 
     this.isRunning = true; // Bandera para controlar si el juego está corriendo

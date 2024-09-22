@@ -16,7 +16,7 @@ class Player {
     this.savedPiece = null;
     this.isPieceSaved = false;
     this.score = 10;
-    this.linesCleared = 0;  // Nuevo contador de líneas completadas
+    this.linesCleared = 0; // Nuevo contador de líneas completadas
 
     this.gridSize = 30; // Tamaño de cada celda en la cuadrícula
 
@@ -26,65 +26,102 @@ class Player {
 
   initCanvas() {
     // Verifica si ya hay un canvas en el DOM, si no, clona y agrega el template
-    if (!this.tetris.element.querySelector('.tetris')) {
-      const template = document.getElementById('player-template').content.cloneNode(true);
-      this.tetris.element.appendChild(template);  // Agrega el template al DOM
+    if (!this.tetris.element.querySelector(".tetris")) {
+      const template = document
+        .getElementById("player-template")
+        .content.cloneNode(true);
+      this.tetris.element.appendChild(template); // Agrega el template al DOM
     }
 
     // Ahora intenta obtener el canvas
-    this.canvas = this.tetris.element.querySelector('.player-board');
+    this.canvas = this.tetris.element.querySelector(".player-board");
     if (this.canvas) {
-      this.context = this.canvas.getContext('2d');
+      this.context = this.canvas.getContext("2d");
       this.canvas.width = this.arena.matrix[0].length * this.gridSize;
       this.canvas.height = this.arena.matrix.length * this.gridSize;
     } else {
-      console.error('Canvas no encontrado.');
+      console.error("Canvas no encontrado.");
     }
   }
 
   createPiece(type) {
     // Creación de piezas
-    if (type === 'T') {
+    if (type === "T") {
       return [
-        [0, 0, 0],
-        [1, 1, 1],
-        [0, 1, 0],
+        [0, 0, 0,0],
+        [1, 1, 1,0],
+        [0, 1, 0,0],
+        [0, 0, 0,0],
       ];
-    } else if (type === 'O') {
+    } else if (type === "O") {
       return [
-        [2, 2],
-        [2, 2],
+        [0, 0,0,0],
+        [0, 2,2,0],
+        [0, 2,2,0],
+        [0, 0,0,0],
       ];
-    } else if (type === 'L') {
+    } else if (type === "L") {
       return [
-        [0, 3, 0],
-        [0, 3, 0],
-        [0, 3, 3],
+        [0, 3, 0,0],
+        [0, 3, 0,0],
+        [0, 3, 3,0],
+        [0, 0, 0,0],
       ];
-    } else if (type === 'J') {
+    } else if (type === "J") {
       return [
-        [0, 4, 0],
-        [0, 4, 0],
-        [4, 4, 0],
+        [0, 4, 0,0],
+        [0, 4, 0,0],
+        [4, 4, 0,0],
+        [0, 0, 0,0],
       ];
-    } else if (type === 'I') {
+    } else if (type === "I") {
       return [
         [0, 5, 0, 0],
         [0, 5, 0, 0],
         [0, 5, 0, 0],
         [0, 5, 0, 0],
       ];
-    } else if (type === 'S') {
+    } else if (type === "S") {
       return [
-        [0, 6, 6],
-        [6, 6, 0],
-        [0, 0, 0],
+        [0, 6, 6,0],
+        [6, 6, 0,0],
+        [0, 0, 0,0],
+        [0, 0, 0,0],
       ];
-    } else if (type === 'Z') {
+    } else if (type === "Z") {
       return [
-        [7, 7, 0],
-        [0, 7, 7],
-        [0, 0, 0],
+        [7, 7, 0,0],
+        [0, 7, 7,0],
+        [0, 0, 0,0],
+        [0, 0, 0,0],
+      ];
+    } else if (type === "C") {
+      return [
+        [8, 8, 0,0],
+        [8, 0, 0,0],
+        [8, 8, 0,0],
+        [0, 0, 0,0],
+      ];
+    } else if (type === "i") {
+      return [
+        [9, 9, 0, 0],
+        [9, 9, 0, 0],
+        [9, 9, 0, 0],
+        [0, 0, 0, 0],
+      ];
+    } else if (type === "_") {
+      return [
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [10, 10, 0, 0],
+        [0, 0, 0, 0],
+      ];
+    } else if (type === "+") {
+      return [
+        [0, 12, 0, 0],
+        [12, 12, 12, 0],
+        [0, 12, 0, 0],
+        [0, 0, 0, 0],
       ];
     }
   }
@@ -96,21 +133,21 @@ class Player {
     if (this.arena.collide(this)) {
       this.pos.y--;
       this.arena.merge(this);
-      const lines = this.arena.sweep();  // Guardar el número de líneas eliminadas
-      this.score += lines * 10;  // Aumentar el puntaje según las líneas
-      this.linesCleared += lines;  // Actualizar el contador de líneas
+      const lines = this.arena.sweep(); // Guardar el número de líneas eliminadas
+      this.score += lines * 10; // Aumentar el puntaje según las líneas
+      this.linesCleared += lines; // Actualizar el contador de líneas
 
-      this.events.emit('score', this.score);
-      this.events.emit('linesCleared', this.linesCleared);  // Emitir el evento de líneas eliminadas
+      this.events.emit("score", this.score);
+      this.events.emit("linesCleared", this.linesCleared); // Emitir el evento de líneas eliminadas
       // Verificar si hay Game Over
       if (this.pos.y === 0) {
-        this.tetris.gameOver();  // Llamar a gameOver cuando el jugador pierde
+        this.tetris.gameOver(); // Llamar a gameOver cuando el jugador pierde
         return;
       }
       this.reset();
       return;
     }
-    this.events.emit('pos', this.pos);
+    this.events.emit("pos", this.pos);
   }
   dropFast() {
     while (!this.arena.collide(this)) {
@@ -118,17 +155,16 @@ class Player {
     }
     this.pos.y--;
     this.arena.merge(this);
-    
-    
+
     const lines = this.arena.sweep();
     this.score += lines * 10;
-    this.linesCleared += lines;  // Actualizar el contador de líneas
+    this.linesCleared += lines; // Actualizar el contador de líneas
 
-    this.events.emit('score', this.score);
-    this.events.emit('linesCleared', this.linesCleared);  // Emitir el evento de líneas eliminadas
+    this.events.emit("score", this.score);
+    this.events.emit("linesCleared", this.linesCleared); // Emitir el evento de líneas eliminadas
 
     this.reset();
-    this.events.emit('pos', this.pos);
+    this.events.emit("pos", this.pos);
   }
 
   move(dir) {
@@ -137,42 +173,59 @@ class Player {
       this.pos.x -= dir;
       return;
     }
-    this.events.emit('pos', this.pos);
+    this.events.emit("pos", this.pos);
   }
 
   reset() {
-    const pieces = 'ILJOTSZ';
+    const pieces = "ILJOTSZCi_+";
     this.matrix = this.createPiece(pieces[(pieces.length * Math.random()) | 0]);
     this.pos.y = 0;
     this.pos.x =
-        ((this.arena.matrix[0].length / 2) | 0) - (this.matrix[0].length / 2) | 0;
+      (((this.arena.matrix[0].length / 2) | 0) - this.matrix[0].length / 2) | 0;
 
     // Añadir una pequeña pausa antes de verificar la colisión
     setTimeout(() => {
-        // Verificación inmediata de colisión (posible "game over")
-        if (this.arena.collide(this)) {
-            this.tetris.gameOver();  // Llamar a gameOver cuando el jugador pierde
-            return;
-        }
+      // Verificación inmediata de colisión (posible "game over")
+      if (this.arena.collide(this)) {
+        this.tetris.gameOver(); // Llamar a gameOver cuando el jugador pierde
+        return;
+      }
 
-        this.events.emit('pos', this.pos);
-        this.events.emit('matrix', this.matrix);
+      this.events.emit("pos", this.pos);
+      this.events.emit("matrix", this.matrix);
     }, 100); // Pausa de 100 ms
-}
-  
- addGarbageLines(lines) {
-  const width = this.matrix[0].length; // Ancho del tablero
-  for (let i = 0; i < lines; i++) {
-    const garbageLine = new Array(width).fill(0);
-    // Agregar un hueco aleatorio
-    const hole = Math.floor(Math.random() * width);
-    garbageLine[hole] = 0;
-    // Añadir la línea de basura al final del tablero
-    this.matrix.pop();  // Eliminar la fila superior
-    this.matrix.unshift(garbageLine);  // Añadir la línea de basura abajo
   }
-  this.events.emit('matrix', this.matrix); // Emitir el evento de actualización
-}
+
+  addGarbageLines(lines) {
+    const width = this.matrix[0].length; // Ancho del tablero
+    for (let i = 0; i < lines; i++) {
+      const garbageLine = new Array(width).fill(0);
+      // Agregar un hueco aleatorio
+      const hole = Math.floor(Math.random() * width);
+      garbageLine[hole] = 0;
+      // Añadir la línea de basura al final del tablero
+      this.matrix.pop(); // Eliminar la fila superior
+      this.matrix.unshift(garbageLine); // Añadir la línea de basura abajo
+    }
+    this.events.emit("matrix", this.matrix); // Emitir el evento de actualización
+  }
+
+  showSavedPiece() {
+    console.log(this.savedPiece);
+    let nF = 0;
+    let nC = 0;
+    this.savedPiece.map((f) => {
+      nF++;
+      f.map((c) => {
+        nC++;
+        let e = (document.querySelector(
+          `.fila${nF} .columna${nC}`
+        ).style = `background: ${this.tetris.colors[c]};`);
+        console.log();
+      });
+      nC = 0;
+    });
+  }
 
   savePiece() {
     if (!this.isPieceSaved) {
@@ -185,6 +238,8 @@ class Player {
         this.savedPiece = this.matrix;
         this.reset();
       }
+
+      this.showSavedPiece();
       this.isPieceSaved = true;
     }
   }
@@ -197,6 +252,7 @@ class Player {
       this.pos.y = 0; // Resetea la posición vertical para que la pieza guardada aparezca en la parte superior
       this.pos.x = 5;
       this.isPieceSaved = false;
+      this.showSavedPiece();
     }
   }
 
@@ -213,7 +269,7 @@ class Player {
         return;
       }
     }
-    this.events.emit('matrix', this.matrix);
+    this.events.emit("matrix", this.matrix);
   }
 
   _rotateMatrix(matrix, dir) {
@@ -236,7 +292,7 @@ class Player {
       this.drawGrid(); // Dibuja la cuadrícula
       this.drawMatrix(this.matrix, this.pos);
     } else {
-      console.error('Contexto del canvas no disponible.');
+      console.error("Contexto del canvas no disponible.");
     }
   }
   clearCanvas() {
@@ -246,7 +302,7 @@ class Player {
   drawGrid() {
     const width = this.canvas.width;
     const height = this.canvas.height;
-    this.context.strokeStyle = '#ddd'; // Color de las líneas de la cuadrícula
+    this.context.strokeStyle = "#ddd"; // Color de las líneas de la cuadrícula
     this.context.lineWidth = 0.5; // Ancho de las líneas de la cuadrícula
 
     // Dibuja las líneas verticales
@@ -271,7 +327,7 @@ class Player {
       matrix.forEach((row, y) => {
         row.forEach((value, x) => {
           if (value) {
-            this.context.fillStyle = 'red'; // Cambia esto según el color de la pieza
+            this.context.fillStyle = "red"; // Cambia esto según el color de la pieza
             this.context.fillRect(
               (offset.x + x) * this.gridSize,
               (offset.y + y) * this.gridSize,

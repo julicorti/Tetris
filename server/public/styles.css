@@ -1,4 +1,31 @@
+.savedPiece{
+  background: black;
+  border:  white 5px solid;
+  border-radius: 20px;
 
+  position: absolute;
+  top: 13%;
+  left: 25%;
+  width: 200px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+.savedPiece .fila {
+  outline: 1px solid white;
+  width: 120px;
+  height: 30px;
+  display: flex;
+}
+.savedPiece .fila .columna{
+  /* background: red; */
+  outline: 1px solid white;
+  width: 30px;
+  height: 30px;
+  
+}
 .game-over-screen {
   position: absolute;
   top: 0;
