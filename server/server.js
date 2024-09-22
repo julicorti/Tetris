@@ -15,8 +15,9 @@ var corsOptions = {
 }
 app.use(cors(corsOptions));
 io.on('connection', (socket) => {
+  
   console.log('A player connected', socket.id);
-
+ 
   // Evento para manejar cuando un jugador se desconecta
   socket.on('disconnect', () => {
     console.log('A player disconnected', socket.id);
