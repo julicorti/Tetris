@@ -10,14 +10,14 @@ class Player {
 
     this.dropCounter = 0;
     this.dropInterval = this.DROP_SLOW;
-
+    this.pieces = "ILJOTSZCi_+";
     this.pos = { x: 0, y: 0 };
     this.matrix = null;
     this.savedPiece = null;
     this.isPieceSaved = false;
     this.score = 10;
     this.linesCleared = 0; // Nuevo contador de líneas completadas
-
+    this.lose = false;
     this.gridSize = 30; // Tamaño de cada celda en la cuadrícula
 
     this.initCanvas(); // Inicializa el canvas
@@ -48,31 +48,31 @@ class Player {
     // Creación de piezas
     if (type === "T") {
       return [
-        [0, 0, 0,0],
-        [1, 1, 1,0],
-        [0, 1, 0,0],
-        [0, 0, 0,0],
+        [0, 0, 0, 0],
+        [1, 1, 1, 0],
+        [0, 1, 0, 0],
+        [0, 0, 0, 0],
       ];
     } else if (type === "O") {
       return [
-        [0, 0,0,0],
-        [0, 2,2,0],
-        [0, 2,2,0],
-        [0, 0,0,0],
+        [0, 0, 0, 0],
+        [0, 2, 2, 0],
+        [0, 2, 2, 0],
+        [0, 0, 0, 0],
       ];
     } else if (type === "L") {
       return [
-        [0, 3, 0,0],
-        [0, 3, 0,0],
-        [0, 3, 3,0],
-        [0, 0, 0,0],
+        [0, 3, 0, 0],
+        [0, 3, 0, 0],
+        [0, 3, 3, 0],
+        [0, 0, 0, 0],
       ];
     } else if (type === "J") {
       return [
-        [0, 4, 0,0],
-        [0, 4, 0,0],
-        [4, 4, 0,0],
-        [0, 0, 0,0],
+        [0, 4, 0, 0],
+        [0, 4, 0, 0],
+        [4, 4, 0, 0],
+        [0, 0, 0, 0],
       ];
     } else if (type === "I") {
       return [
@@ -83,24 +83,24 @@ class Player {
       ];
     } else if (type === "S") {
       return [
-        [0, 6, 6,0],
-        [6, 6, 0,0],
-        [0, 0, 0,0],
-        [0, 0, 0,0],
+        [0, 6, 6, 0],
+        [6, 6, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
       ];
     } else if (type === "Z") {
       return [
-        [7, 7, 0,0],
-        [0, 7, 7,0],
-        [0, 0, 0,0],
-        [0, 0, 0,0],
+        [7, 7, 0, 0],
+        [0, 7, 7, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
       ];
     } else if (type === "C") {
       return [
-        [8, 8, 0,0],
-        [8, 0, 0,0],
-        [8, 8, 0,0],
-        [0, 0, 0,0],
+        [8, 8, 0, 0],
+        [8, 0, 0, 0],
+        [8, 8, 0, 0],
+        [0, 0, 0, 0],
       ];
     } else if (type === "i") {
       return [
@@ -175,16 +175,50 @@ class Player {
     }
     this.events.emit("pos", this.pos);
   }
-
+  getNextPiece() {
+    if (!this.nextPiece) {
+      this.nextPiece = this.createPiece(
+        this.pieces[(this.pieces.length * Math.random()) | 0]
+      );
+      setTimeout(() => {
+        this.showNextPiece();
+      }, 10);
+      return this.createPiece(
+        this.pieces[(this.pieces.length * Math.random()) | 0]
+      );
+    }
+    let actual = this.nextPiece;
+    this.nextPiece = this.createPiece(
+      this.pieces[(this.pieces.length * Math.random()) | 0]
+    );
+    console.log(this.nextPiece);
+    this.showNextPiece();
+    return actual;
+  }
+  showNextPiece() {
+    let nF = 0;
+    let nC = 0;
+    this.nextPiece.map((f) => {
+      nF++;
+      f.map((c) => {
+        nC++;
+        let e = (document.querySelector(
+          `.nextPiece .fila${nF} .columna${nC}`
+        ).style = `background: ${this.tetris.colors[c]};`);
+      });
+      nC = 0;
+    });
+  }
   reset() {
-    const pieces = "ILJOTSZCi_+";
-    this.matrix = this.createPiece(pieces[(pieces.length * Math.random()) | 0]);
+    this.matrix = this.getNextPiece();
+    /* this.matrix = this.createPiece(this.pieces[(this.pieces.length * Math.random()) | 0]); */
+
     this.pos.y = 0;
     this.pos.x =
       (((this.arena.matrix[0].length / 2) | 0) - this.matrix[0].length / 2) | 0;
 
     // Añadir una pequeña pausa antes de verificar la colisión
-    setTimeout(() => {
+    /*   setTimeout(() => {
       // Verificación inmediata de colisión (posible "game over")
       if (this.arena.collide(this)) {
         this.tetris.gameOver(); // Llamar a gameOver cuando el jugador pierde
@@ -193,7 +227,7 @@ class Player {
 
       this.events.emit("pos", this.pos);
       this.events.emit("matrix", this.matrix);
-    }, 100); // Pausa de 100 ms
+    }, 100); */ // Pausa de 100 ms
   }
 
   addGarbageLines(lines) {
@@ -219,7 +253,7 @@ class Player {
       f.map((c) => {
         nC++;
         let e = (document.querySelector(
-          `.fila${nF} .columna${nC}`
+          `.savedPiece .fila${nF} .columna${nC}`
         ).style = `background: ${this.tetris.colors[c]};`);
         console.log();
       });

@@ -3,6 +3,7 @@ const localTetris = tetrisManager.createPlayer()
 localTetris.element.classList.add('local')
 localTetris.run()
 let startTime;
+
 let timerInterval;
 const connectionManager = new ConnectionManager(tetrisManager)
 connectionManager.connect('ws://localhost:8080')
@@ -45,7 +46,15 @@ function startTimer() {
 }
 
 // Actualiza el cronómetro en el DOM
+
 function updateTimer() {
+  const player = localTetris.player
+
+  if (player.lose ){
+    player.lose =  false
+    startTime = new Date()
+    
+  }
   const currentTime = new Date();
   const elapsedTime = Math.floor((currentTime - startTime) / 1000); // Tiempo en segundos
 

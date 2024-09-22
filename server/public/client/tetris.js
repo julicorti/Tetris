@@ -56,12 +56,16 @@ class Tetris {
       <div class="game-over-message">Game Over</div>
       <button class="reset-button">Restart</button>
     `;
-    
+    this.player.reset( );  // Reiniciar el jugador
+
     this.element.appendChild(gameOverDiv);
 
     // Botón de reinicio
     const resetButton = gameOverDiv.querySelector('.reset-button');
     resetButton.addEventListener('click', () => {
+      this.element.querySelector('.score').innerText = 10;
+      this.player.score = 10
+      this.player.lose = true;
       this.resetGame();
     });
   }
