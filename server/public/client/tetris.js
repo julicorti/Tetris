@@ -10,29 +10,21 @@ class Tetris {
 
     this.colors = [
       null,
-      '#FF0D72',
-      '#0DC2FF',
-      '#0DFF72',
-      '#F538FF',
-      '#FF830D',
-      '#FFE138',
-      '#3877FF',
-      '#0a3a6d',
-      '#00660e',
-      '#630066',
-      '#777777',
-      '#f7916d',
-
+      '#FF0D72', '#0DC2FF', '#0DFF72', '#F538FF', '#FF830D',
+      '#FFE138', '#3877FF', '#0a3a6d', '#00660e', '#630066', '#777777', '#f7916d',
     ];
 
-    this.isRunning = true; // Bandera para controlar si el juego está corriendo
-    this.speedInterval = null; // Referencia para el intervalo de velocidad
+    this.isRunning = true;
+    this.speedInterval = null;
+    
+    // Guardar el valor inicial del dropInterval
+    this.initialDropInterval = this.player.dropInterval;
 
     this._bindEvents();
 
     let lastTime = 0;
     this._update = (time = 0) => {
-      if (!this.isRunning) return; // Detener el ciclo de actualización si el juego no está corriendo
+      if (!this.isRunning) return;
       const deltaTime = time - lastTime;
       lastTime = time;
 
@@ -43,7 +35,7 @@ class Tetris {
     };
 
     this.updateScore();
-    this.startSpeedIncrement(); // Inicia el incremento de velocidad
+    this.startSpeedIncrement(); // Iniciar incremento de velocidad
   }
 
   gameOver() {
@@ -71,24 +63,27 @@ class Tetris {
   }
 
   resetGame() {
-    this.isRunning = true; // Reiniciar el estado del juego
+    this.isRunning = true;
     const gameOverScreen = this.element.querySelector('.game-over-screen');
     if (gameOverScreen) {
       gameOverScreen.remove();
     }
 
-    // Reiniciar el juego
+    // Reiniciar el tablero y el jugador
     this.arena.clear();
     this.player.reset();
     this.updateScore();
 
-    // Limpiar el intervalo previo para evitar acumulación
+    // Restaurar la velocidad inicial
+    this.player.dropInterval = this.initialDropInterval;
+
+    // Limpiar el intervalo anterior y reiniciar el incremento de velocidad
     if (this.speedInterval) {
       clearInterval(this.speedInterval);
     }
-    this.startSpeedIncrement(); // Reiniciar el incremento de velocidad
+    this.startSpeedIncrement();
 
-    requestAnimationFrame(this._update); // Reiniciar el ciclo de actualización
+    requestAnimationFrame(this._update);
   }
 
   startSpeedIncrement() {
@@ -98,11 +93,11 @@ class Tetris {
     }
 
     this.speedInterval = setInterval(() => {
-      if (this.player.dropInterval > 100) { // Ajusta el valor según tu preferencia mínima
-        this.player.dropInterval -= 50; // Incrementa la velocidad cada 10 segundos
+      if (this.player.dropInterval > 100) {
+        this.player.dropInterval -= 50;
         console.log(`Nueva velocidad: ${this.player.dropInterval}`);
       }
-    }, 10000); // 10 segundos
+    }, 10000); // Cada 10 segundos
   }
 
   _bindEvents() {
