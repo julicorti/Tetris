@@ -10,7 +10,7 @@ class Player {
 
     this.dropCounter = 0;
     this.dropInterval = this.DROP_SLOW;
-    this.pieces = "ILJOTSZCi_+";
+    this.pieces = "ILJOTSZi_";
     this.pos = { x: 0, y: 0 };
     this.matrix = null;
     this.savedPiece = null;
@@ -141,7 +141,9 @@ class Player {
       this.events.emit("linesCleared", this.linesCleared); // Emitir el evento de líneas eliminadas
       // Verificar si hay Game Over
       if (this.pos.y === 0) {
+        // console.log("Perdiste")
         this.tetris.gameOver(); // Llamar a gameOver cuando el jugador pierde
+       
         return;
       }
       this.reset();

@@ -51,7 +51,7 @@ class Tetris {
     this.player.reset( );  // Reiniciar el jugador
 
     this.element.appendChild(gameOverDiv);
-
+   
     // Botón de reinicio
     const resetButton = gameOverDiv.querySelector('.reset-button');
     resetButton.addEventListener('click', () => {
