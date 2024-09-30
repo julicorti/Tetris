@@ -4,7 +4,7 @@ class Arena {
     while (h--) {
       matrix.push(new Array(w).fill(0));
     }
-    matrix.pop();
+   /*  matrix.pop();
     matrix.pop();
     matrix.pop();
     matrix.pop();
@@ -17,7 +17,7 @@ class Arena {
 
     matrix[matrix.length - 3][11] = 0;
     matrix[matrix.length - 4][11] = 0;
-
+ */
     this.matrix = matrix;
     this.events = new Events();
     this.garbageColor = "rgba(255, 0, 0, 0.5)"; // Color por defecto para las líneas de basura
