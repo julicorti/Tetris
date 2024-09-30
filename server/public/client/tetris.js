@@ -130,17 +130,17 @@ class Tetris {
   drawBackgroundGrid() {
     const { width, height } = this.canvas;
     const cellSize = 1;
-
-    this.context.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-    this.context.lineWidth = 0.07;
-
+  
+    this.context.strokeStyle = 'rgba(255, 255, 255, 0.3)'; // Aumenta la opacidad de las líneas para hacerlas más blancas
+    this.context.lineWidth = 0.05; // Mantén las líneas delgadas
+  
     for (let x = 0; x < width; x += cellSize) {
       this.context.beginPath();
       this.context.moveTo(x, 0);
       this.context.lineTo(x, height);
       this.context.stroke();
     }
-
+  
     for (let y = 0; y < height; y += cellSize) {
       this.context.beginPath();
       this.context.moveTo(0, y);
@@ -148,22 +148,26 @@ class Tetris {
       this.context.stroke();
     }
   }
+  
 
   drawMatrix(matrix, offset) {
     this.updateScore();
     matrix.forEach((row, y) => {
-      row.forEach((value, x) => {
-        if (value !== 0) {
-          this.context.fillStyle = this.colors[value];
-          this.context.fillRect(x + offset.x, y + offset.y, 1, 1);
+        row.forEach((value, x) => {
+            if (value !== 0) {
+                this.context.fillStyle = this.colors[value];
+                // Dibujar en tamaño normal
+                this.context.fillRect((x + offset.x) * 1, (y + offset.y) * 1, 1, 1); // Usar la escala para dibujar directamente
 
-          this.context.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-          this.context.lineWidth = 0.10;
-          this.context.strokeRect(x + offset.x, y + offset.y, 1, 1);
-        }
-      });
+                // Borde
+                this.context.strokeStyle = 'rgba(255, 255, 255, 0.8)'; // Hacer el borde más claro
+                this.context.lineWidth = 0.08; // Hacer el borde más fino
+                this.context.strokeRect((x + offset.x) * 1, (y + offset.y) * 1, 1, 1);
+            }
+        });
     });
-  }
+}
+
 
   run() {
     this.isRunning = true;

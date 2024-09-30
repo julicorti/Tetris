@@ -31,7 +31,7 @@ class ConnectionManager {
     });
   }
   addLineToPlayer(lines) {
-    if (lines == 3) {
+    if (lines == 2) {
       console.log(this.localTetris.player);
       this.localTetris.player.nextPiece =
         this.localTetris.player.createPiece("+");

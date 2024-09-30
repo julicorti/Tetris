@@ -13,7 +13,8 @@ body {
 }
 
 canvas {
-  border: solid 0.2em #707070;
+  border: solid 0.3em #fff; /* Borde blanco para más contraste */
+  background-color: #111; /* Fondo del tablero oscuro para que las fichas resalten */
   height: 90vh;
 }
 
